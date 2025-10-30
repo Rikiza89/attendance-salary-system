@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}勤怠編集{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-pencil"></i> 勤怠編集
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> 保存
+                        </button>
+                        <a href="{% url 'attendance_calendar' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> キャンセル
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

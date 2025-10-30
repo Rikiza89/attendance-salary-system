@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}管理者ダッシュボード{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="bi bi-shield-check"></i> 管理者ダッシュボード
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 統計カード -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6 class="card-title">未承認年休</h6>
+                <h2>{{ pending_leaves }}</h2>
+                <p class="mb-0">件</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6 class="card-title">未払給与</h6>
+                <h2>{{ unpaid_payrolls }}</h2>
+                <p class="mb-0">件</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 部署別出勤率 -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-building"></i> 部署別出勤率（本日）
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>部署</th>
+                            <th>出勤率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dept in dept_stats %}
+                        <tr>
+                            <td>{{ dept.department }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ dept.attendance_rate }}%">
+                                        {{ dept.attendance_rate }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 残業ランキング -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <i class="bi bi-clock"></i> 残業時間ランキング（今月）
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>順位</th>
+                            <th>社員名</th>
+                            <th>残業時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in overtime_ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.employee__name }}</td>
+                            <td class="text-warning">{{ item.total_overtime|floatformat:1 }}h</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-tools"></i> 管理機能
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'leave_request_list' %}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-check-circle"></i> 年休承認
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/attendance/attendance/" class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-pencil"></i> 勤怠編集
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/payroll/payroll/" class="btn btn-outline-warning w-100 mb-2">
+                            <i class="bi bi-cash"></i> 給与管理
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/admin/employees/employee/" class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="bi bi-people"></i> 社員管理
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

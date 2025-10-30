@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}勤怠カレンダー{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2><i class="bi bi-calendar3"></i> 勤怠カレンダー</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="btn-group">
+            <a href="?year={{ prev_month.year }}&month={{ prev_month.month }}" class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i> 前月
+            </a>
+            <button class="btn btn-primary">{{ year }}年 {{ month }}月</button>
+            <a href="?year={{ next_month.year }}&month={{ next_month.month }}" class="btn btn-outline-primary">
+                次月 <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'export_attendance' %}?year={{ year }}&month={{ month }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Excelエクスポート
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-bordered text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>日</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                    <th>土</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar_data %}
+                <tr>
+                    {% for day_data in week %}
+                    <td class="{% if day_data.is_today %}table-primary{% endif %}" style="height: 100px; vertical-align: top;">
+                        {% if day_data %}
+                            <div class="fw-bold">{{ day_data.day }}</div>
+                            {% if day_data.attendance %}
+                                <small class="d-block">
+                                    {% if day_data.attendance.leave_type != 'normal' %}
+                                        <span class="badge bg-info">{{ day_data.attendance.get_leave_type_display }}</span>
+                                    {% else %}
+                                        <span class="text-success">{{ day_data.attendance.clock_in_time|default:"" }}</span>
+                                        <br>
+                                        <span class="text-danger">{{ day_data.attendance.clock_out_time|default:"" }}</span>
+                                        {% if day_data.attendance.working_hours %}
+                                        <br>
+                                        <small>{{ day_data.attendance.working_hours }}h</small>
+                                        {% endif %}
+                                    {% endif %}
+                                </small>
+                                <a href="{% url 'attendance_edit' day_data.attendance.pk %}" class="btn btn-sm btn-outline-secondary mt-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <h5>凡例</h5>
+    <span class="badge bg-info">年休</span>
+    <span class="badge bg-warning text-dark">特休</span>
+    <span class="badge bg-danger">欠勤</span>
+    <span class="badge bg-secondary">病欠</span>
+</div>
+{% endblock %}

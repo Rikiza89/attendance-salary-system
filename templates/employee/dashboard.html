@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}ダッシュボード{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="bi bi-speedometer"></i> ダッシュボード
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 今日の勤怠 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-calendar-day"></i> 今日の勤怠
+            </div>
+            <div class="card-body">
+                {% if today_attendance %}
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted mb-1">出勤時刻</p>
+                            <h4>{{ today_attendance.clock_in_time|default:"未打刻" }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted mb-1">退勤時刻</p>
+                            <h4>{{ today_attendance.clock_out_time|default:"未打刻" }}</h4>
+                        </div>
+                    </div>
+                    {% if today_attendance.working_hours %}
+                    <hr>
+                    <p class="mb-1">勤務時間: <strong>{{ today_attendance.working_hours }}時間</strong></p>
+                    {% if today_attendance.overtime_hours > 0 %}
+                    <p class="mb-0">残業時間: <strong class="text-warning">{{ today_attendance.overtime_hours }}時間</strong></p>
+                    {% endif %}
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">本日の勤怠記録がありません</p>
+                {% endif %}
+                <hr>
+                <form method="post" action="{% url 'clock_in_out_manual' %}">
+                    {% csrf_token %}
+                    {% if not today_attendance or not today_attendance.clock_in_time %}
+                        <button type="submit" name="action" value="clock_in" class="btn btn-success">
+                            <i class="bi bi-box-arrow-in-right"></i> 出勤打刻
+                        </button>
+                    {% elif not today_attendance.clock_out_time %}
+                        <button type="submit" name="action" value="clock_out" class="btn btn-danger">
+                            <i class="bi bi-box-arrow-right"></i> 退勤打刻
+                        </button>
+                    {% else %}
+                        <span class="text-success"><i class="bi bi-check-circle"></i> 本日の打刻完了</span>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 今月の統計 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-bar-chart"></i> 今月の勤務統計
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <p class="text-muted mb-1">出勤日数</p>
+                        <h3>{{ month_stats.days_worked|default:0 }}</h3>
+                        <small>日</small>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-muted mb-1">勤務時間</p>
+                        <h3>{{ month_stats.total_hours|default:0|floatformat:1 }}</h3>
+                        <small>時間</small>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-muted mb-1">残業時間</p>
+                        <h3 class="text-warning">{{ month_stats.total_overtime|default:0|floatformat:1 }}</h3>
+                        <small>時間</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 年休情報 -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-calendar-check"></i> 年休情報
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-primary">{{ employee.remaining_leave_days }}</h2>
+                <p class="text-muted mb-0">残り年休日数</p>
+                <hr>
+                <a href="{% url 'leave_request_create' %}" class="btn btn-info btn-sm">
+                    <i class="bi bi-plus-circle"></i> 年休申請
+                </a>
+                {% if pending_leaves > 0 %}
+                <span class="badge bg-warning text-dark ms-2">{{ pending_leaves }}件 申請中</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 給与情報 -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <i class="bi bi-cash-stack"></i> 最新給与
+            </div>
+            <div class="card-body">
+                {% if latest_payroll %}
+                    <h5>{{ latest_payroll.month }}</h5>
+                    <h3 class="text-success">¥{{ latest_payroll.total_salary|floatformat:0 }}</h3>
+                    <a href="{% url 'payslip_view' latest_payroll.pk %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-file-earmark-text"></i> 明細確認
+                    </a>
+                {% else %}
+                    <p class="text-muted">給与データがありません</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- クイックアクション -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-lightning"></i> クイックアクション
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'attendance_calendar' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-calendar3"></i> 勤怠カレンダー
+                    </a>
+                    <a href="{% url 'leave_request_list' %}" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-list-check"></i> 年休申請一覧
+                    </a>
+                    <a href="{% url 'payroll_list' %}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-file-text"></i> 給与明細一覧
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

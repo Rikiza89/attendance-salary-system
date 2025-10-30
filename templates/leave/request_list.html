@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}年休申請一覧{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2><i class="bi bi-calendar-check"></i> 年休申請一覧</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'leave_request_create' %}" class="btn btn-info">
+            <i class="bi bi-plus-circle"></i> 新規申請
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>申請日</th>
+                    {% if user.employee.is_manager or user.employee.is_admin %}
+                    <th>社員名</th>
+                    {% endif %}
+                    <th>期間</th>
+                    <th>日数</th>
+                    <th>理由</th>
+                    <th>ステータス</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leave_requests %}
+                <tr>
+                    <td>{{ leave.request_date }}</td>
+                    {% if user.employee.is_manager or user.employee.is_admin %}
+                    <td>{{ leave.employee.name }}</td>
+                    {% endif %}
+                    <td>{{ leave.start_date }} 〜 {{ leave.end_date }}</td>
+                    <td>{{ leave.days }}日</td>
+                    <td>{{ leave.reason|truncatewords:10 }}</td>
+                    <td>
+                        {% if leave.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">申請中</span>
+                        {% elif leave.status == 'approved' %}
+                            <span class="badge bg-success">承認済</span>
+                        {% else %}
+                            <span class="badge bg-danger">却下</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.employee.is_manager or user.employee.is_admin %}
+                            {% if leave.status == 'pending' %}
+                                <a href="{% url 'leave_request_approve' leave.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-check-circle"></i> 承認/却下
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">申請データがありません</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

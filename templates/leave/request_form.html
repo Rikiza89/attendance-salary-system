@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}年休申請{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-calendar-plus"></i> 年休申請
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    残り年休日数: <strong>{{ user.employee.remaining_leave_days }}日</strong>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-send"></i> 申請する
+                        </button>
+                        <a href="{% url 'leave_request_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> 戻る
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

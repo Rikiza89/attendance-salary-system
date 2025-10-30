@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}給与明細{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-file-earmark-text"></i> 給与明細書
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <p class="mb-1"><strong>社員番号:</strong> {{ payroll.employee.employee_no }}</p>
+                        <p class="mb-1"><strong>氏名:</strong> {{ payroll.employee.name }}</p>
+                        <p class="mb-1"><strong>部署:</strong> {{ payroll.employee.department }}</p>
+                    </div>
+                    <div class="col-6 text-end">
+                        <p class="mb-1"><strong>対象月:</strong> {{ payroll.month }}</p>
+                        <p class="mb-1"><strong>発行日:</strong> {{ payroll.created_at|date:"Y-m-d" }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">支給項目</h5>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>基本給</td>
+                                    <td class="text-end">¥{{ payroll.base_salary|floatformat:0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>残業代</td>
+                                    <td class="text-end">¥{{ payroll.overtime_pay|floatformat:0 }}</td>
+                                </tr>
+                                {% if payroll.bonus > 0 %}
+                                <tr>
+                                    <td>賞与</td>
+                                    <td class="text-end">¥{{ payroll.bonus|floatformat:0 }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr class="table-light">
+                                    <th>支給合計</th>
+                                    <th class="text-end">¥{{ payroll.base_salary|add:payroll.overtime_pay|add:payroll.bonus|floatformat:0 }}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="mb-3">控除項目</h5>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>健康保険料</td>
+                                    <td class="text-end text-danger">¥{{ payroll.health_insurance|floatformat:0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>厚生年金保険料</td>
+                                    <td class="text-end text-danger">¥{{ payroll.pension_insurance|floatformat:0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>雇用保険料</td>
+                                    <td class="text-end text-danger">¥{{ payroll.employment_insurance|floatformat:0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>所得税</td>
+                                    <td class="text-end text-danger">¥{{ payroll.income_tax|floatformat:0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>住民税</td>
+                                    <td class="text-end text-danger">¥{{ payroll.residence_tax|floatformat:0 }}</td>
+                                </tr>
+                                {% if payroll.other_deduction > 0 %}
+                                <tr>
+                                    <td>その他控除</td>
+                                    <td class="text-end text-danger">¥{{ payroll.other_deduction|floatformat:0 }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr class="table-light">
+                                    <th>控除合計</th>
+                                    <th class="text-end text-danger">¥{{ payroll.total_deduction|floatformat:0 }}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="alert alert-success mt-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 class="mb-0">差引支給額</h5>
+                        </div>
+                        <div class="col-6 text-end">
+                            <h3 class="mb-0">¥{{ payroll.total_salary|floatformat:0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                {% if payroll.remarks %}
+                <div class="alert alert-info mt-3">
+                    <strong>備考:</strong> {{ payroll.remarks }}
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{% url 'payslip_download' payroll.pk %}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Excelダウンロード
+                    </a>
+                    <a href="{% url 'payroll_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> 一覧に戻る
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

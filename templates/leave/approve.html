@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}年休承認{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-check-square"></i> 年休申請承認
+            </div>
+            <div class="card-body">
+                <h5>申請情報</h5>
+                <table class="table">
+                    <tr>
+                        <th>社員名</th>
+                        <td>{{ leave_request.employee.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>申請日</th>
+                        <td>{{ leave_request.request_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>期間</th>
+                        <td>{{ leave_request.start_date }} 〜 {{ leave_request.end_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>日数</th>
+                        <td>{{ leave_request.days }}日</td>
+                    </tr>
+                    <tr>
+                        <th>理由</th>
+                        <td>{{ leave_request.reason }}</td>
+                    </tr>
+                    <tr>
+                        <th>残年休</th>
+                        <td>{{ leave_request.employee.remaining_leave_days }}日</td>
+                    </tr>
+                </table>
+
+                <hr>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> 決定
+                        </button>
+                        <a href="{% url 'leave_request_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> 戻る
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
