@@ -121,3 +121,21 @@ def admin_dashboard(request):
         'unpaid_payrolls': unpaid_payrolls,
     }
     return render(request, 'admin_dashboard/dashboard.html', context)
+
+
+from django.http import JsonResponse
+from core.nfc_reader import check_nfc_available, nfc_auto_clock
+import json
+
+@login_required
+def check_nfc_status(request):
+    """NFCデバイスの状態確認API"""
+    available = check_nfc_available()
+    print(f"NFC Available: {available}")  # デバッグ用
+    return JsonResponse({'nfc_available': available})
+
+@login_required
+def nfc_auto_attendance(request):
+    """NFC自動打刻API"""
+    result = nfc_auto_clock(timeout=3)
+    return JsonResponse(result)

@@ -92,5 +92,4 @@ class Payroll(models.Model):
         )
         
         # 差引支給額
-
         self.total_salary = self.base_salary + self.overtime_pay + self.bonus - self.total_deduction

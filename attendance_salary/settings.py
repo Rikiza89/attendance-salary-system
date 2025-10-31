@@ -140,8 +140,8 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # NFC設定
-NFC_ENABLED = os.getenv('NFC_ENABLED', 'False') == 'True'
-
+# NFC_ENABLED = os.getenv('NFC_ENABLED', 'False') == 'True'
+NFC_ENABLED = True
 # 勤務時間設定
 WORK_START_TIME = '09:00'
 WORK_END_TIME = '18:00'

@@ -152,3 +152,26 @@
     </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    // ダッシュボードページでのみNFC自動打刻を実行
+    {% if not today_attendance or not today_attendance.clock_in_time or not today_attendance.clock_out_time %}
+    // 打刻が未完了の場合のみ実行
+    if (nfcAvailable && !nfcChecked) {
+        nfcChecked = true;
+        showNFCModal();
+    }
+    // モーダルイベント処理を追加
+document.getElementById('nfcModal').addEventListener('shown.bs.modal', function () {
+    // モーダル表示後にaria-hiddenを削除
+    this.removeAttribute('aria-hidden');
+});
+
+document.getElementById('nfcModal').addEventListener('hidden.bs.modal', function () {
+    // モーダル非表示時にaria-hiddenを設定
+    this.setAttribute('aria-hidden', 'true');
+});
+    {% endif %}
+</script>
+{% endblock %}

@@ -6,8 +6,10 @@ from datetime import datetime, timedelta
 from calendar import monthcalendar
 from .models import Attendance
 from .forms import AttendanceForm
-from core.nfc_reader import nfc_clock_in_out
+# from core.nfc_reader import nfc_clock_in_out
+from core.nfc_reader import nfc_auto_clock
 import openpyxl
+from django.http import JsonResponse
 
 @login_required
 def attendance_calendar(request):
@@ -113,8 +115,9 @@ def nfc_attendance(request):
     if not settings.NFC_ENABLED:
         return HttpResponse("NFC機能は無効です", status=400)
     
-    result = nfc_clock_in_out()
-    return HttpResponse(result)
+    from core.nfc_reader import nfc_auto_clock
+    result = nfc_auto_clock()
+    return JsonResponse(result)
 
 @login_required
 def export_attendance_excel(request):
