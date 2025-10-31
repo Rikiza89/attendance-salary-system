@@ -41,9 +41,9 @@ Django製の包括的な勤怠・給与管理システム。日本の税制に�
 
 ### 必要要件
 
-- Python 3.12以上
-- PostgreSQL 14以上
-- NFCリーダー
+- Python 3.11以上（３.１１．９はテスト済）
+- PostgreSQL 14以上（sqlite3のみテスト済）
+- NFCリーダー（NFC PaSoRi RC-S380テスト済）
 
 ### インストール
 
@@ -79,6 +79,7 @@ GRANT ALL PRIVILEGES ON DATABASE attendance_salary TO attendance_user;
 
 6. **マイグレーション実行**
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -95,9 +96,13 @@ python manage.py seed_data
 9. **開発サーバー起動**
 ```bash
 python manage.py runserver
+
+#またはホストを設定し（例：123.123.123.123 - port:12345）
+#この場合は自分が設定したホストもsettings.pyに追加　⇒ ALLOWED_HOSTS = ['localhost', '127.0.0.1','123.123.123.123']
+python manage.py runserver 123.123.123.123：12345
 ```
 
-アクセス: `http://localhost:8000`
+アクセス: `http://localhost:8000` または `http://123.123.123.123：12345`
 
 ## 📱 使い方
 
@@ -270,3 +275,4 @@ python manage.py collectstatic
 **バージョン**: 1.0.0  
 
 **最終更新**: 2025年10月
+
