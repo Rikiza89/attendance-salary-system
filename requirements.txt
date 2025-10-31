@@ -1,0 +1,11 @@
+Django
+requests
+PySide6
+nfcpy
+psycopg2-binary
+django-crispy-forms
+crispy-bootstrap5
+openpyxl
+pandas
+python-dotenv
+Pillow
