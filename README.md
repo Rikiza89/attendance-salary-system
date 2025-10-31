@@ -163,7 +163,7 @@ NFC_ENABLED=True
 ```
 
 ### NFCテスト
-このメソッドを使用して従業員NFCリーダー用のUIDを取得・登録。
+このメソッドを使用して従業員NFCリーダー用のUIDを取得・adminサイトユーザー項目に登録。
 
 ```bash
 python manage.py shell
@@ -275,4 +275,5 @@ python manage.py collectstatic
 **バージョン**: 1.0.0  
 
 **最終更新**: 2025年10月
+
 
