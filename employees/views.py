@@ -9,6 +9,7 @@ from attendance.models import Attendance
 from leave.models import LeaveRequest
 from payroll.models import Payroll
 from django.http import HttpResponse
+from .models import Employee
 
 def employee_login(request):
     if request.method == 'POST':
@@ -139,3 +140,68 @@ def nfc_auto_attendance(request):
     """NFC自動打刻API"""
     result = nfc_auto_clock(timeout=3)
     return JsonResponse(result)
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def nfc_clock_api(request):
+    """NFC端末用API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'POST only'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        uid = data.get('uid')
+        action = data.get('action')  # clock_in or clock_out
+        
+        if not uid or not action:
+            return JsonResponse({'success': False, 'message': 'UIDとactionが必要です'}, status=400)
+        
+        try:
+            employee = Employee.objects.get(nfc_id=uid, status='active')
+        except Employee.DoesNotExist:
+            return JsonResponse({'success': False, 'message': '登録されていないカードです'}, status=404)
+        
+        today = timezone.now().date()
+        now_time = timezone.now().time()
+        
+        attendance, created = Attendance.objects.get_or_create(
+            employee=employee,
+            date=today,
+            defaults={'source': 'nfc'}
+        )
+        
+        if action == 'clock_in':
+            if attendance.clock_in_time:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'{employee.name}さんは既に出勤済みです'
+                })
+            attendance.clock_in_time = now_time
+            attendance.save()
+            return JsonResponse({
+                'success': True,
+                'message': f'{employee.name}さん、おはようございます\n出勤: {now_time.strftime("%H:%M")}'
+            })
+        
+        elif action == 'clock_out':
+            if not attendance.clock_in_time:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'{employee.name}さんは出勤記録がありません'
+                })
+            if attendance.clock_out_time:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'{employee.name}さんは既に退勤済みです'
+                })
+            attendance.clock_out_time = now_time
+            attendance.save()
+            return JsonResponse({
+                'success': True,
+                'message': f'{employee.name}さん、お疲れ様でした\n退勤: {now_time.strftime("%H:%M")}'
+            })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'エラー: {str(e)}'}, status=500)

@@ -8,4 +8,5 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('api/nfc-status/', views.check_nfc_status, name='nfc_status'),
     path('api/nfc-auto/', views.nfc_auto_attendance, name='nfc_auto_attendance'),
+    path('api/nfc-clock/', views.nfc_clock_api, name='nfc_clock_api'),
 ]
