@@ -41,7 +41,7 @@ class Payroll(models.Model):
     other_deduction = models.DecimalField('その他控除', max_digits=10, decimal_places=2, default=0)
     
     total_deduction = models.DecimalField('控除合計', max_digits=10, decimal_places=2, default=0)
-    total_salary = models.DecimalField('支給額', max_digits=10, decimal_places=2)
+    total_salary = models.DecimalField('支給額', max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField('ステータス', max_length=20, choices=STATUS_CHOICES, default='calculated')
     paid_at = models.DateTimeField('支払日時', null=True, blank=True)
     remarks = models.TextField('備考', blank=True)
@@ -92,4 +92,5 @@ class Payroll(models.Model):
         )
         
         # 差引支給額
+
         self.total_salary = self.base_salary + self.overtime_pay + self.bonus - self.total_deduction
